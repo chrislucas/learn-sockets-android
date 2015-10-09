@@ -1,5 +1,6 @@
 package wiselabs.com.br.rest.http.request;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -17,7 +18,7 @@ import java.util.Map;
  *
  * https://apps.twitter.com/app/8622233/keys
  */
-public class TwitterSearch extends AsyncTask<Void, Void, Void> {
+public class TwitterAuthentication extends AsyncTask<Void, Void, String> {
 
     private static String KEY = "ocEL25NbST766M5SYZlSLbcnU"
             ,SECRET = "xmoL0nS4YGMq6IHPawe7suKJTq3lbCo9RU5mZvlVE5hZ2ExO11"
@@ -26,7 +27,7 @@ public class TwitterSearch extends AsyncTask<Void, Void, Void> {
             ,URL_AUTHORIZE = "https://api.twitter.com/oauth/authorize"
             ,URL_ACCESS = "https://api.twitter.com/oauth/access_token";
 
-    public TwitterSearch() {
+    public TwitterAuthentication() {
         super();
     }
 
@@ -36,8 +37,8 @@ public class TwitterSearch extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(String result) {
+        super.onPostExecute(result);
     }
 
     @Override
@@ -46,10 +47,9 @@ public class TwitterSearch extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected String doInBackground(String ... result) {
 
         try {
-
             Map<String, String> pair = new HashMap<>();
             pair.put("grant_type", "client_credentials");
             String result = HttpRequest.post(URL_AUTHENTICATION)
@@ -59,16 +59,59 @@ public class TwitterSearch extends AsyncTask<Void, Void, Void> {
             Gson gson = new Gson();
             String json = gson.toJson(result);
             JSONObject jsonObj = new JSONObject(result);
+            result[0] = jsonObj.getString("access_token");
         } catch(Exception e) {
             Log.e("EXCEPTION_DO_BACKGROUND", e.getMessage());
         }
 
-        return null;
+        return result[0];
     }
 
     private String generateEncodedKey() {
         String token = KEY + ":" + SECRET;
         String encode = Base64.encodeToString(token.getBytes(), Base64.NO_WRAP);
         return encode;
+    }
+
+    private class Pair<K, V> implements Map.Entry<K, V> {
+        private K k;
+        private V v;
+
+        public Pair(K k, V v) {
+            this.k = k;
+            this.v = v;
+        }
+
+        /**
+         * Returns the key.
+         *
+         * @return the key
+         */
+        @Override
+        public K getKey() {
+            return null;
+        }
+
+        /**
+         * Returns the value.
+         *
+         * @return the value
+         */
+        @Override
+        public V getValue() {
+            return null;
+        }
+
+        /**
+         * Sets the value of this entry to the specified value, replacing any
+         * existing value.
+         *
+         * @param object the new value to set.
+         * @return object the replaced value of this entry.
+         */
+        @Override
+        public V setValue(V object) {
+            return null;
+        }
     }
 }
