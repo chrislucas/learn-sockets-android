@@ -1,0 +1,21 @@
+Lembrando que o autor do codigo da classe HttpRequest esta nesse link
+https://github.com/kevinsawicki/http-request
+Devidos creditos
+
+HttpRequest em android
+https://developer.android.com/training/volley/simple.html
+http://hayageek.com/android-http-post-get/
+http://hayageek.com/android-http-post-get/
+http://www.androidhive.info/2011/10/android-making-http-requests/
+
+Threads
+https://developer.android.com/training/multiple-threads/define-runnable.html
+https://developer.android.com/training/multiple-threads/communicate-ui.html
+http://pt.stackoverflow.com/questions/12105/diferen%C3%A7a-entre-handler-e-thread
+
+Serializable and Parcelable
+https://coderwall.com/p/vfbing/passing-objects-between-activities-in-android
+
+Gson
+http://www.studytrails.com/java/json/java-google-json-java-to-json.jsp
+http://www.mkyong.com/java/how-do-convert-java-object-to-from-json-format-gson-api/
