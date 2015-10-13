@@ -16,6 +16,9 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import project.com.serrat.classes.UtilsNetworking;
+
+import wiselabs.com.br.rest.AsyncResponse;
 import wiselabs.com.br.rest.R;
 
 /**
@@ -25,8 +28,19 @@ public class TwitterTask extends AsyncTask<String, Void, String[]> {
 
     private ProgressDialog pDialog;
 
-    private final Context context;          // activity que chamous Essa AsyncTask
-    private final String accessToken;
+    private final Context context;                      // activity que chamous Essa AsyncTask
+    private final String accessToken;                   // string de acesso
+    private AsyncResponse asyncResponse;                // interface que permite pegar o resultado de response
+    private String response;
+
+    public AsyncResponse getAsyncResponse() {
+        return asyncResponse;
+    }
+
+    public void setAsyncResponse(AsyncResponse asyncResponse) {
+        this.asyncResponse = asyncResponse;
+    }
+
     //private static final String ACC_TKN = "3401147921-FpjLwbGvAhIK3pYSeptRldPf5yNm8hYiN9Q3j9u";
     //private static final String ACC_TKN_SCT = "o1R7BHxVF7ka7Hl345Cw3opHJY40nqcqjm3phTopoKyxh";
     private static final String []  URL_SEARCH = {
@@ -80,13 +94,7 @@ public class TwitterTask extends AsyncTask<String, Void, String[]> {
     protected void onPostExecute(String[] result) {
         super.onPostExecute(result);
         if(result != null) {
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, result);
-            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View layout = inflater.inflate(R.layout.activity_main, null);
-            if(layout != null) {
-                ListView list = (ListView) layout.findViewById(R.id.result_list);
-                list.setAdapter(adapter);
-            }
+            this.getAsyncResponse().getResponse(result);
         }
         pDialog.dismiss();
     }
@@ -123,6 +131,10 @@ public class TwitterTask extends AsyncTask<String, Void, String[]> {
     protected String[] doInBackground(String... params) {
         String [] tweets = null;
         try {
+            boolean isConnected = UtilsNetworking.testConnection(getContext());
+            if(!isConnected)
+                UtilsNetworking.openSettingsLocation(getContext());
+
             String search = params[0];
             if(TextUtils.isEmpty(search)) {
                 return null;
@@ -134,7 +146,7 @@ public class TwitterTask extends AsyncTask<String, Void, String[]> {
             String json = gson.toJson(content);
             JSONObject jsonObj = new JSONObject(content);
 
-            // JSONArra
+            // JSONArray
             JSONArray jsonArray = jsonObj.getJSONArray("statuses");
             tweets = new String[jsonArray.length()];
 
@@ -145,7 +157,7 @@ public class TwitterTask extends AsyncTask<String, Void, String[]> {
                 tweets[i] = text + ":" + user;
             }
         } catch(Exception e) {
-            Log.e("Exception_DO_BACKGROUND_TASK", e.getMessage());
+            Log.e("EXCEPTION_BACKGROUND_TASK ".concat(getContext().getPackageName()), e.getMessage(), e);
         }
         return tweets;
     }
