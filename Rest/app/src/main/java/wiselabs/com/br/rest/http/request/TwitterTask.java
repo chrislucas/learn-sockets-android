@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +17,7 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import project.com.serrat.classes.UtilsNetworking;
+import wiselabs.com.br.rest.utils.device.UtilsNetworking;
 
 import wiselabs.com.br.rest.AsyncResponse;
 import wiselabs.com.br.rest.R;
@@ -133,7 +134,7 @@ public class TwitterTask extends AsyncTask<String, Void, String[]> {
         try {
             boolean isConnected = UtilsNetworking.testConnection(getContext());
             if(!isConnected)
-                UtilsNetworking.openSettingsLocation(getContext());
+                UtilsNetworking.openSettings(getContext(), Settings.ACTION_WIFI_SETTINGS);
 
             String search = params[0];
             if(TextUtils.isEmpty(search)) {

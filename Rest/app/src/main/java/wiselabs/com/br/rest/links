@@ -1,3 +1,7 @@
 API twitter
 sobre statuses
 https://dev.twitter.com/rest/reference/get/statuses/home_timeline
+
+
+Progress inside Async Task
+http://stackoverflow.com/questions/22885547/progess-dialog-with-fragment-inside-activity-call-asynctask

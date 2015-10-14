@@ -1,6 +1,9 @@
 package wiselabs.com.br.rest.http.request;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 
@@ -12,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import wiselabs.com.br.rest.AsyncResponse;
-
+import wiselabs.com.br.rest.utils.device.UtilsNetworking;
 /**
  * Created by C.Lucas on 09/10/2015.
  *
@@ -22,7 +25,7 @@ public class TwitterAuthentication extends AsyncTask<Void, Void, Void> {
 
     private AsyncResponse asyncResponse;
     private String token;
-
+    private Context context;
 
     public AsyncResponse getAsyncResponse() {
         return asyncResponse;
@@ -40,6 +43,14 @@ public class TwitterAuthentication extends AsyncTask<Void, Void, Void> {
         this.token = token;
     }
 
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     private static final String KEY = "ocEL25NbST766M5SYZlSLbcnU"
             ,SECRET = "xmoL0nS4YGMq6IHPawe7suKJTq3lbCo9RU5mZvlVE5hZ2ExO11"
             ,URL_AUTHENTICATION = "https://api.twitter.com/oauth2/token"
@@ -48,8 +59,9 @@ public class TwitterAuthentication extends AsyncTask<Void, Void, Void> {
             ,URL_AUTHORIZE = "https://api.twitter.com/oauth/authorize"
             ,URL_ACCESS = "https://api.twitter.com/oauth/access_token";
 
-    public TwitterAuthentication() {
+    public TwitterAuthentication(Context context) {
         super();
+        this.context = context;
     }
 
     @Override
@@ -98,6 +110,11 @@ public class TwitterAuthentication extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
+            boolean isConnected = UtilsNetworking.testConnection(getContext());
+            if(!isConnected) {
+                UtilsNetworking.openSettings(getContext(), Settings.ACTION_WIFI_SETTINGS);
+            }
+
             Map<String, String> pair = new HashMap<>();
             pair.put("grant_type", "client_credentials");
             String encode = generateEncodedKey();

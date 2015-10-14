@@ -9,13 +9,13 @@ public class User {
     // private Integer idType;
     private String name;
     private String login;
-    private String imei;
+    private String imei[];
 
-    public String getImei() {
+    public String[] getImei() {
         return imei;
     }
 
-    public void setImei(String imei) {
+    public void setImei(String imei[]) {
         this.imei = imei;
     }
 
@@ -45,6 +45,7 @@ public class User {
 
     @Override
     public String toString() {
-        return getName() + ":" + getId();
+        String imei[] = getImei();
+        return getName() + ":" + getId() + " " + imei[0] + " " + imei[1];
     }
 }

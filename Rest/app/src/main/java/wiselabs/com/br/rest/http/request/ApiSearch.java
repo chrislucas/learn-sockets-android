@@ -1,8 +1,10 @@
 package wiselabs.com.br.rest.http.request;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -16,10 +18,12 @@ import java.util.List;
 import wiselabs.com.br.rest.AsyncResponse;
 import wiselabs.com.br.rest.User;
 
+import wiselabs.com.br.rest.utils.device.UtilsNetworking;
+
 /**
  * Created by christoffer on 10/13/15.
  */
-public class ApiSearch extends AsyncTask<Void, Void, List<User>> {
+public class ApiSearch extends AsyncTask<String, Void, List<User>> {
 
     private AsyncResponse asyncResponse;
     private Context context;
@@ -28,8 +32,6 @@ public class ApiSearch extends AsyncTask<Void, Void, List<User>> {
     public Context getContext() {
         return context;
     }
-
-    private static final String URL = "http://wgx.com.br/demo/serrat/api/index.php/usuario?token=wgx@_2k15!&format=json";
 
     public AsyncResponse getAsyncResponse() {
         return asyncResponse;
@@ -76,6 +78,7 @@ public class ApiSearch extends AsyncTask<Void, Void, List<User>> {
             this.getAsyncResponse().getResponse(users);
         }
         this.pDialog.dismiss();
+        return;
     }
 
     /**
@@ -106,10 +109,15 @@ public class ApiSearch extends AsyncTask<Void, Void, List<User>> {
      * @see #publishProgress
      */
     @Override
-    protected List<User> doInBackground(Void... params) {
+    protected List<User> doInBackground(String... urls) {
         List<User> list = new ArrayList<>();
         try {
-            String result = HttpRequest.get(URL).body();
+            boolean isConnected = UtilsNetworking.testConnection(getContext());
+            if(!isConnected) {
+                UtilsNetworking.openSettings(getContext(), Settings.ACTION_WIFI_SETTINGS);
+            }
+
+            String result = HttpRequest.get(urls[0]).body();
             Gson gson = new Gson();
             String json = gson.toJson(result);
             JSONObject jsonObject = new JSONObject(result);
@@ -120,13 +128,14 @@ public class ApiSearch extends AsyncTask<Void, Void, List<User>> {
                 String name = object.getString("nome");
                 String pwd = object.getString("senha");
                 int idUser = object.getInt("id_usuario");
-                //String idUserId = object.getString("id_usuario_tipo");
-                String imei = object.getString("imei");
+                String imei1 = object.getString("imei_1");
+                String imei2 = object.getString("imei_2");
+
                 User user = new User();
                 user.setId(idUser);
-                user.setImei(imei);
                 user.setLogin(login);
                 user.setName(name);
+                user.setImei(new String[] {imei1, imei2});
                 list.add(user);
             }
         } catch(Exception e) {

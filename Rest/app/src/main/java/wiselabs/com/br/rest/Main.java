@@ -16,6 +16,8 @@ import wiselabs.com.br.rest.http.request.ApiSearch;
 import wiselabs.com.br.rest.http.request.TwitterAuthentication;
 import wiselabs.com.br.rest.http.request.TwitterTask;
 
+import wiselabs.com.br.rest.utils.device.UtilsNetworking;
+
 public class Main extends AppCompatActivity implements AsyncResponse {
 
     private EditText textSearch;
@@ -30,11 +32,15 @@ public class Main extends AppCompatActivity implements AsyncResponse {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        UtilsNetworking.getPhoneManager(this);
+
+
         this.textSearch = (EditText) findViewById(R.id.text_search);
         this.sendSearch = (Button) findViewById(R.id.button_search);
         this.sendSearch2 = (Button) findViewById(R.id.button_search_api);
         this.resultSearch = (ListView) findViewById(R.id.result_list);
-        TwitterAuthentication taskAuthtentication = new TwitterAuthentication();
+        TwitterAuthentication taskAuthtentication = new TwitterAuthentication(this);
         taskAuthtentication.setAsyncResponse(this);
         taskAuthtentication.execute();
         return;
@@ -44,15 +50,10 @@ public class Main extends AppCompatActivity implements AsyncResponse {
         if(textSearch != null) {
             String param = textSearch.getText().toString();
             if(this.response != null) {
-                TwitterTask taskSearch = new TwitterTask(this, this.response);
+                String token = this.response;
+                TwitterTask taskSearch = new TwitterTask(this, token);
                 taskSearch.setAsyncResponse(this);
                 taskSearch.execute(param);
-                if(this.responses != null) {
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                            android.R.layout.simple_list_item_1, this.responses);
-                    this.resultSearch.setAdapter(adapter);
-                }
-
             } else {
                 Toast.makeText(this, "ACCESS_TOKEN NULL", Toast.LENGTH_LONG).show();
             }
@@ -63,12 +64,8 @@ public class Main extends AppCompatActivity implements AsyncResponse {
     public void toSearchAPI(View view) {
         ApiSearch apiSearch = new ApiSearch(this);
         apiSearch.setAsyncResponse(this);
-        apiSearch.execute();
-        if(this.listResponse != null) {
-            ArrayAdapter<User> adapter = new ArrayAdapter<User>(this,
-                    android.R.layout.simple_list_item_1, this.listResponse);
-            this.resultSearch.setAdapter(adapter);
-        }
+        String url = "http://wgx.com.br/demo/serrat/api/index.php/usuario?token=wgx@_2k15!&format=json";
+        apiSearch.execute(url);
         return;
     }
 
@@ -84,6 +81,9 @@ public class Main extends AppCompatActivity implements AsyncResponse {
     public void getResponse(Object[] responses) {
         if(responses != null) {
             this.responses = (String[]) responses;
+            if(responses != null) {
+                fillListPosResponse((String[])responses);
+            }
         }
     }
 
@@ -91,6 +91,28 @@ public class Main extends AppCompatActivity implements AsyncResponse {
     public void getResponse(List list) {
         if(list != null) {
             this.listResponse = list;
+            if(list != null) {
+                fillListPosResponse(this.listResponse);
+            }
+        }
+    }
+
+    public void fillListPosResponse(List list) {
+        if(list != null) {
+            ArrayAdapter<User> adapter = new ArrayAdapter<User>(this,
+                    android.R.layout.simple_list_item_1, this.listResponse);
+            this.resultSearch.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
+        return;
+    }
+
+    public void fillListPosResponse(String[] objects) {
+        if(objects != null) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_list_item_1, objects);
+            this.resultSearch.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
     }
 }
