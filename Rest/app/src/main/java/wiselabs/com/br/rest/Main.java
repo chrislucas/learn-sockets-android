@@ -3,6 +3,7 @@ package wiselabs.com.br.rest;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,9 +17,10 @@ import wiselabs.com.br.rest.http.request.ApiSearch;
 import wiselabs.com.br.rest.http.request.TwitterAuthentication;
 import wiselabs.com.br.rest.http.request.TwitterTask;
 
+import wiselabs.com.br.rest.sensor.AccelerometerListener;
 import wiselabs.com.br.rest.utils.device.UtilsNetworking;
 
-public class Main extends AppCompatActivity implements AsyncResponse {
+public class Main extends AppCompatActivity implements AsyncResponse, AccelerometerListener {
 
     private EditText textSearch;
     private ListView resultSearch;
@@ -27,6 +29,31 @@ public class Main extends AppCompatActivity implements AsyncResponse {
     private String responses[];
     private List<User> listResponse;
     private AsyncResponse<String> delegate;
+
+    @Override
+    public void onShake(float force) {
+
+    }
+
+    @Override
+    public void onAccelerationChange(float x, float y, float z) {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +67,22 @@ public class Main extends AppCompatActivity implements AsyncResponse {
         this.sendSearch = (Button) findViewById(R.id.button_search);
         this.sendSearch2 = (Button) findViewById(R.id.button_search_api);
         this.resultSearch = (ListView) findViewById(R.id.result_list);
+        this.resultSearch.setLongClickable(true);
+        this.resultSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                return;
+            }
+        });
+
+        this.resultSearch.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getBaseContext(), "Hold on", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
         TwitterAuthentication taskAuthtentication = new TwitterAuthentication(this);
         taskAuthtentication.setAsyncResponse(this);
         taskAuthtentication.execute();
