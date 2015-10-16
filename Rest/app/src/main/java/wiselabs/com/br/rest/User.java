@@ -3,10 +3,8 @@ package wiselabs.com.br.rest;
 /**
  * Created by christoffer on 10/13/15.
  */
-public class User {
+public class User extends Abstract {
 
-    private Integer id;
-    // private Integer idType;
     private String name;
     private String login;
     private String imei[];

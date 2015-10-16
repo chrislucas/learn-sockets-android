@@ -18,6 +18,7 @@ import wiselabs.com.br.rest.http.request.TwitterAuthentication;
 import wiselabs.com.br.rest.http.request.TwitterTask;
 
 import wiselabs.com.br.rest.sensor.AccelerometerListener;
+import wiselabs.com.br.rest.sensor.AccelerometerManager;
 import wiselabs.com.br.rest.utils.device.UtilsNetworking;
 
 public class Main extends AppCompatActivity implements AsyncResponse, AccelerometerListener {
@@ -29,10 +30,11 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
     private String responses[];
     private List<User> listResponse;
     private AsyncResponse<String> delegate;
+    private AccelerometerManager accManager;
 
     @Override
     public void onShake(float force) {
-
+        Toast.makeText(this, String.format("force %.5f", force), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -43,16 +45,27 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
     @Override
     protected void onResume() {
         super.onResume();
+        if(this.accManager.isSupportAccelerometer()) {
+            this.accManager.registerListener(this);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        if(this.accManager.isRunning()) {
+            this.accManager.stopListener();
+            Toast.makeText(this, "Finalizando Accelerometer Listener", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(this.accManager.isRunning()) {
+            this.accManager.stopListener();
+            Toast.makeText(this, "Finalizando Accelerometer Listener", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -82,6 +95,8 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
                 return true;
             }
         });
+
+        this.accManager = new AccelerometerManager(this);
 
         TwitterAuthentication taskAuthtentication = new TwitterAuthentication(this);
         taskAuthtentication.setAsyncResponse(this);

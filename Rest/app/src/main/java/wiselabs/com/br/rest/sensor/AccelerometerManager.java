@@ -12,7 +12,9 @@ import java.util.List;
 
 /**
  * Created by christoffer on 10/15/15.
- * Exemplo site : http://androidexample.com/Accelerometer_Basic_Example_-_Detect_Phone_Shake_Motion/index.php?view=article_discription&aid=109&aaid=131
+ * Exemplo site :
+ *
+ * http://androidexample.com/Accelerometer_Basic_Example_-_Detect_Phone_Shake_Motion/index.php?view=article_discription&aid=109&aaid=131
  *
  */
 public class AccelerometerManager {
@@ -31,22 +33,23 @@ public class AccelerometerManager {
     public AccelerometerManager(Context context) {
         this.context = context;
         this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        setSupportedAccelerometer();
+        configureSupportedAccelerometer();
+        configureSensorEventListener();
     }
 
-    public Sensor getSensor() {
+    private Sensor getSensor() {
         return sensor;
     }
 
-    public Context getContext() {
+    private Context getContext() {
         return context;
     }
 
-    public SensorManager getSensorManager() {
+    private SensorManager getSensorManager() {
         return sensorManager;
     }
 
-    public AccelerometerListener getAccListener() {
+    private AccelerometerListener getAccListener() {
         return accListener;
     }
 
@@ -58,7 +61,7 @@ public class AccelerometerManager {
         return running;
     }
 
-    public SensorEventListener getSensorEventListener() {
+    private SensorEventListener getSensorEventListener() {
         return sensorEventListener;
     }
 
@@ -69,14 +72,14 @@ public class AccelerometerManager {
                     getSensorManager().unregisterListener(getSensorEventListener());
                 }
            } catch(Exception e) {
-               Log.e("", "");
+               Log.e("EXCEPTION_SENSOR", e.getMessage());
            }
         }
         return;
     }
 
     // retorna TRUE se ao menos 1 acelerometro estiver habilitado no dispositivo
-    public void setSupportedAccelerometer() {
+    private void configureSupportedAccelerometer() {
         List<Sensor> sensors = new ArrayList<>();
         if(getSensorManager() != null)
             sensors.addAll(getSensorManager().getSensorList(Sensor.TYPE_ACCELEROMETER));
@@ -98,11 +101,17 @@ public class AccelerometerManager {
             if(sensors.size() > 0) {
                 Sensor sensor = sensors.get(0);
                 if(getSensorEventListener() != null) {
-                    this.running = getSensorManager().registerListener(getSensorEventListener(), sensor, SensorManager.SENSOR_DELAY_GAME);
+                    this.running = getSensorManager().registerListener(getSensorEventListener(),
+                            sensor, SensorManager.SENSOR_DELAY_GAME);
                     this.accListener = accListener;
                 }
             }
         }
+    }
+
+    public void registerListener(AccelerometerListener accListener, float threshold, int interval) {
+        reconfigureParametersAcc(threshold, interval);
+        registerListener(accListener);
     }
 
     private void configureSensorEventListener() {
@@ -111,9 +120,38 @@ public class AccelerometerManager {
             private long timeDiff   = 0;
             private long lastUpdate = 0;
             private long lastShake  = 0;
+
+            private float x = 0, y = 0, z = 0,
+                    lastX = 0, lastY = 0, lastZ = 0, force = 0;
+
             @Override
             public void onSensorChanged(SensorEvent event) {
-
+                this.now = event.timestamp;
+                x = event.values[0];
+                y = event.values[1];
+                z = event.values[2];
+                if(lastUpdate == 0) {
+                    lastUpdate = now;
+                    lastShake = now;
+                    lastX = x;
+                    lastY = y;
+                    lastZ = z;
+                } else {
+                    timeDiff = now - lastUpdate;
+                    if(timeDiff > 0) {
+                        force = Math.abs(x+y+z-lastX-lastY-lastZ);
+                        if(Float.compare(force, threshold) > 0) {
+                            if(now - lastUpdate >= interval)
+                                getAccListener().onShake(force);
+                            lastShake = now;
+                        }
+                        lastX = x;
+                        lastY = y;
+                        lastZ = z;
+                        lastUpdate = now;
+                    }
+                }
+                getAccListener().onAccelerationChange(x, y, z);
             }
 
             @Override
@@ -123,4 +161,15 @@ public class AccelerometerManager {
         };
         return;
     }
+/*
+    private int compareNumbers(double a, double b) {
+        double threshold = 1E-9;
+        if( (a - b) > 0.0 )
+            return 1;
+        else if(  (a-b) < threshold)
+            return 0;
+        else if( (a-b) < 0.0)
+            return -1;
+    }
+    */
 }
