@@ -14,8 +14,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import wiselabs.com.br.rest.AsyncResponse;
+import wiselabs.com.br.rest.Entity;
+import wiselabs.com.br.rest.FactoryRequest;
 import wiselabs.com.br.rest.User;
 
 import wiselabs.com.br.rest.utils.device.UtilsNetworking;
@@ -23,7 +26,7 @@ import wiselabs.com.br.rest.utils.device.UtilsNetworking;
 /**
  * Created by christoffer on 10/13/15.
  */
-public class ApiSearch extends AsyncTask<String, Void, List<User>> {
+public class ApiSearch extends AsyncTask<Map.Entry<String, FactoryRequest>, Void, List<Entity>> {
 
     private AsyncResponse asyncResponse;
     private Context context;
@@ -40,7 +43,6 @@ public class ApiSearch extends AsyncTask<String, Void, List<User>> {
     public void setAsyncResponse(AsyncResponse asyncResponse) {
         this.asyncResponse = asyncResponse;
     }
-
 
     public ApiSearch(Context context) {
         this.context = context;
@@ -72,10 +74,10 @@ public class ApiSearch extends AsyncTask<String, Void, List<User>> {
      * @see #onCancelled(Object)
      */
     @Override
-    protected void onPostExecute(List<User> users) {
-        super.onPostExecute(users);
-        if(users != null) {
-            this.getAsyncResponse().getResponse(users);
+    protected void onPostExecute(List<Entity> entities) {
+        super.onPostExecute(entities);
+        if(entities != null) {
+            this.getAsyncResponse().getResponse(entities);
         }
         this.pDialog.dismiss();
         return;
@@ -94,6 +96,7 @@ public class ApiSearch extends AsyncTask<String, Void, List<User>> {
         super.onProgressUpdate(values);
     }
 
+
     /**
      * Override this method to perform a computation on a background thread. The
      * specified parameters are the parameters passed to {@link #execute}
@@ -108,36 +111,28 @@ public class ApiSearch extends AsyncTask<String, Void, List<User>> {
      * @see #onPostExecute
      * @see #publishProgress
      */
+
     @Override
-    protected List<User> doInBackground(String... urls) {
-        List<User> list = new ArrayList<>();
+    protected List<Entity> doInBackground(Map.Entry<String, FactoryRequest>... pair) {
+        List<Entity> list = new ArrayList<>();
         try {
             boolean isConnected = UtilsNetworking.testConnection(getContext());
             if(!isConnected) {
                 UtilsNetworking.openSettings(getContext(), Settings.ACTION_WIFI_SETTINGS);
             }
-
-            String result = HttpRequest.get(urls[0]).body();
-            Gson gson = new Gson();
-            String json = gson.toJson(result);
+            String url = pair[0].getKey();
+            FactoryRequest factoryRequest = pair[0].getValue();
+            String result = HttpRequest.get(url).body();
+            //Gson gson = new Gson();
+            //String json = gson.toJson(result);
             JSONObject jsonObject = new JSONObject(result);
             JSONArray jsonArray = jsonObject.getJSONArray("data");
-            for(int i=0; i<jsonArray.length(); i++) {
-                JSONObject object = jsonArray.getJSONObject(i);
-                String login = object.getString("login");
-                String name = object.getString("nome");
-                String pwd = object.getString("senha");
-                int idUser = object.getInt("id_usuario");
-                String imei1 = object.getString("imei_1");
-                String imei2 = object.getString("imei_2");
+            /*
+            * Fabrica responsavel por receber um array JSON e devolver uma lista
+            * de objetos do tipo Entity
+            * */
+            list =   factoryRequest.create(jsonArray);
 
-                User user = new User();
-                user.setId(idUser);
-                user.setLogin(login);
-                user.setName(name);
-                user.setImei(new String[] {imei1, imei2});
-                list.add(user);
-            }
         } catch(Exception e) {
             Log.e("EXCEPTION_BACKGROUND_TASK ".concat(getContext().getPackageName()), e.getMessage(), e);
         }

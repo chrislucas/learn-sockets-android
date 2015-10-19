@@ -1,7 +1,7 @@
 package wiselabs.com.br.rest;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -10,13 +10,15 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 import wiselabs.com.br.rest.http.request.ApiSearch;
 import wiselabs.com.br.rest.http.request.TwitterAuthentication;
 import wiselabs.com.br.rest.http.request.TwitterTask;
-
 import wiselabs.com.br.rest.sensor.AccelerometerListener;
 import wiselabs.com.br.rest.sensor.AccelerometerManager;
 import wiselabs.com.br.rest.utils.device.UtilsNetworking;
@@ -28,13 +30,14 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
     private Button sendSearch, sendSearch2;
     private String response;
     private String responses[];
-    private List<User> listResponse;
+    private List<Entity> listResponse;
+    private ArrayAdapter<Entity> adapterListEntity;
     private AsyncResponse<String> delegate;
     private AccelerometerManager accManager;
 
     @Override
     public void onShake(float force) {
-        Toast.makeText(this, String.format("force %.5f", force), Toast.LENGTH_LONG).show();
+        // Toast.makeText(this, String.format("force %.5f", force), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -57,6 +60,20 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
             this.accManager.stopListener();
             Toast.makeText(this, "Finalizando Accelerometer Listener", Toast.LENGTH_LONG).show();
         }
+
+        // ----------------- A W E S O M E   M O N S T E R --------------------//
+        int Chris = 1;
+        while (Chris < 4){
+            Toast.makeText(this, Chris + " menino Chris incomoda muita gente!", Toast.LENGTH_LONG).show();
+            Chris++;
+            String incomodam = "incomodam";
+            for(int x = 1; x < Chris; x++){
+                incomodam = incomodam + " incomodam";
+            }
+            Toast.makeText(this, Chris + " meninos Chris "+ incomodam +" muito mais!", Toast.LENGTH_LONG).show();
+        }
+        // ----------------- A W E S O M E   M O N S T E R --------------------//
+
     }
 
     @Override
@@ -73,14 +90,18 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        UtilsNetworking.getPhoneManager(this);
+        this.listResponse = new ArrayList<Entity>();
+        this.adapterListEntity = new ArrayAdapter<Entity>(this, android.R.layout.simple_list_item_1, this.listResponse);
 
+        UtilsNetworking.getPhoneManager(this);
 
         this.textSearch = (EditText) findViewById(R.id.text_search);
         this.sendSearch = (Button) findViewById(R.id.button_search);
         this.sendSearch2 = (Button) findViewById(R.id.button_search_api);
         this.resultSearch = (ListView) findViewById(R.id.result_list);
         this.resultSearch.setLongClickable(true);
+        this.resultSearch.setAdapter(this.adapterListEntity);
+
         this.resultSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -122,8 +143,18 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
     public void toSearchAPI(View view) {
         ApiSearch apiSearch = new ApiSearch(this);
         apiSearch.setAsyncResponse(this);
-        String url = "http://wgx.com.br/demo/serrat/api/index.php/usuario?token=wgx@_2k15!&format=json";
-        apiSearch.execute(url);
+        String url[] = {
+            "http://wgx.com.br/demo/serrat/api/index.php/usuario?token=wgx@_2k15!&format=json"
+        };
+        Map<String, FactoryRequest> map = new HashMap<>();
+        map.put(url[0], new FactoryUser());
+        // map.put(url[1], new FactoryClient());
+
+        Iterator iterator = map.entrySet().iterator();
+        while(iterator.hasNext()) {
+            Map.Entry<String, FactoryRequest> pair = (Map.Entry<String, FactoryRequest>) iterator.next();
+            apiSearch.execute(pair);
+        }
         return;
     }
 
@@ -140,7 +171,7 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
         if(responses != null) {
             this.responses = (String[]) responses;
             if(responses != null) {
-                fillListPosResponse((String[])responses);
+                fillListPosResponse((String[]) responses);
             }
         }
     }
@@ -148,20 +179,13 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
     @Override
     public void getResponse(List list) {
         if(list != null) {
-            this.listResponse = list;
-            if(list != null) {
-                fillListPosResponse(this.listResponse);
-            }
+            this.listResponse.addAll(list);
+            this.adapterListEntity.notifyDataSetChanged();
         }
     }
 
     public void fillListPosResponse(List list) {
-        if(list != null) {
-            ArrayAdapter<User> adapter = new ArrayAdapter<User>(this,
-                    android.R.layout.simple_list_item_1, this.listResponse);
-            this.resultSearch.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }
+        if(list != null) {}
         return;
     }
 

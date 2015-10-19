@@ -3,7 +3,7 @@ package wiselabs.com.br.rest;
 /**
  * Created by christoffer on 10/13/15.
  */
-public class User extends Abstract {
+public class User extends Entity {
 
     private String name;
     private String login;
@@ -15,14 +15,6 @@ public class User extends Abstract {
 
     public void setImei(String imei[]) {
         this.imei = imei;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
