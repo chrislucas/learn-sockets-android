@@ -16,9 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import wiselabs.com.br.rest.entities.Entity;
-import wiselabs.com.br.rest.factory.FactoryRequest;
-import wiselabs.com.br.rest.factory.FactoryUser;
 import wiselabs.com.br.rest.http.request.ApiSearch;
 import wiselabs.com.br.rest.http.request.TwitterAuthentication;
 import wiselabs.com.br.rest.http.request.TwitterTask;
@@ -65,7 +62,6 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
         }
 
         // ----------------- A W E S O M E   M O N S T E R --------------------//
-/*
         int Chris = 1;
         while (Chris < 4){
             Toast.makeText(this, Chris + " menino Chris incomoda muita gente!", Toast.LENGTH_LONG).show();
@@ -76,7 +72,6 @@ public class Main extends AppCompatActivity implements AsyncResponse, Accelerome
             }
             Toast.makeText(this, Chris + " meninos Chris "+ incomodam +" muito mais!", Toast.LENGTH_LONG).show();
         }
-*/
         // ----------------- A W E S O M E   M O N S T E R --------------------//
 
     }

@@ -142,9 +142,10 @@ public class TwitterTask extends AsyncTask<String, Void, String[]> {
             }
             String url = Uri.parse(URL_SEARCH[0] + search).toString();
             String content = HttpRequest.get(url).authorization("Bearer " + getAccessToken()).body();
-
+/*
             Gson gson = new Gson();
             String json = gson.toJson(content);
+*/
             JSONObject jsonObj = new JSONObject(content);
 
             // JSONArray

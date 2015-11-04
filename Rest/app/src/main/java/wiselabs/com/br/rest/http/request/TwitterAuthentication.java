@@ -119,8 +119,8 @@ public class TwitterAuthentication extends AsyncTask<Void, Void, Void> {
             pair.put("grant_type", "client_credentials");
             String encode = generateEncodedKey();
             String result = HttpRequest.post(URL_AUTHENTICATION).authorization("Basic "+encode).form(pair).body();
-            Gson gson = new Gson();
-            String json = gson.toJson(result);
+            //Gson gson = new Gson();
+            //String json = gson.toJson(result);
             JSONObject jsonToken = new JSONObject(result);
             String token = jsonToken.getString("access_token");
             this.setToken(token);

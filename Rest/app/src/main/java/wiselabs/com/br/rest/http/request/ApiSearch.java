@@ -1,13 +1,10 @@
 package wiselabs.com.br.rest.http.request;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.provider.Settings;
 import android.util.Log;
-
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,9 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import wiselabs.com.br.rest.AsyncResponse;
-import wiselabs.com.br.rest.Entity;
-import wiselabs.com.br.rest.FactoryRequest;
-import wiselabs.com.br.rest.User;
+import wiselabs.com.br.rest.entities.Entity;
+import wiselabs.com.br.rest.factory.FactoryRequest;
 
 import wiselabs.com.br.rest.utils.device.UtilsNetworking;
 

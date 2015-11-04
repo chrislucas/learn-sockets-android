@@ -1,8 +1,6 @@
-package wiselabs.com.br.rest;
+package wiselabs.com.br.rest.factory;
 
 import android.util.Log;
-
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,6 +8,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import wiselabs.com.br.rest.entities.Entity;
+import wiselabs.com.br.rest.entities.User;
 
 /**
  * Created by christoffer on 10/19/15.

@@ -7,6 +7,7 @@ import wiselabs.com.br.rest.AsyncResponse;
 
 /**
  * Created by christoffer on 10/13/15.
+ * NAO EH USADA PARA NADA ATE O MOMENTO 04/11/2015
  */
 public class ApiAuthentication extends AsyncTask<Void, Void, Void> {
 
